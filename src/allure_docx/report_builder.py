@@ -261,6 +261,14 @@ class ReportBuilder:
                 if 'name' not in attachment:
                     attachment['name'] = ""
                 self.document.add_paragraph(f"[Attachment] {attachment['name']}", style="Step")
+                if "json" in attachment["type"]:
+                    json_attachment_path = os.path.abspath(join(self.session["allure_dir"], attachment["source"]))
+                    with open(json_attachment_path, "r") as json_attachment:
+                        attachment_content = json.loads(json_attachment.read())
+                        table = self.document.add_table(rows=1, cols=1, style="JSON Table")
+                        hdr_cells = table.rows[0].cells
+                        hdr_cells[0].add_paragraph(json.dumps(attachment_content, indent=4), style="Code")
+                        self.document.add_paragraph("", style=None)
                 if "csv" in attachment["type"]:
                     csv_attachment_path = os.path.abspath(join(self.session["allure_dir"], attachment["source"]))
                     with open(csv_attachment_path, "r", newline="") as csv_attachment:
