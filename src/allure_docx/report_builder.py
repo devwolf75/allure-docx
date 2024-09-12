@@ -3,6 +3,7 @@ import warnings
 import shutil
 import subprocess
 import json
+import csv
 import matplotlib.pyplot as plt
 
 from os import listdir
@@ -260,6 +261,19 @@ class ReportBuilder:
                 if 'name' not in attachment:
                     attachment['name'] = ""
                 self.document.add_paragraph(f"[Attachment] {attachment['name']}", style="Step")
+                if "csv" in attachment["type"]:
+                    csv_attachment_path = os.path.abspath(join(self.session["allure_dir"], attachment["source"]))
+                    with open(csv_attachment_path, "r", newline="") as csv_attachment:
+                        csv_reader = csv.reader(csv_attachment)
+                        csv_content = list(csv_reader)
+                        print(csv_content)
+                        csv_rows = max(len(csv_content), 1)
+                        csv_cols = max(len(csv_content[0]), 1)
+                        table = self.document.add_table(rows=csv_rows, cols=csv_cols, style="Normal table")
+                        for row in range(csv_rows):
+                            cells = table.rows[row].cells
+                            for cell in range(csv_cols):
+                                cells[cell].add_paragraph(csv_content[row][cell])
                 if "image" in attachment["type"]:
                     self.document.add_picture(
                         os.path.join(self.session["allure_dir"], attachment["source"]),
