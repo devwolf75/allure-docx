@@ -267,7 +267,8 @@ class ReportBuilder:
                         attachment_content = json.loads(json_attachment.read())
                         table = self.document.add_table(rows=1, cols=1, style="JSON Table")
                         hdr_cells = table.rows[0].cells
-                        hdr_cells[0].add_paragraph(json.dumps(attachment_content, indent=4), style="Code")
+                        hdr_cells[0].text = json.dumps(attachment_content, indent=4)
+                        hdr_cells[0].paragraphs[0].style = "Code"
                         self.document.add_paragraph("", style=None)
                 if "csv" in attachment["type"]:
                     csv_attachment_path = os.path.abspath(join(self.session["allure_dir"], attachment["source"]))
