@@ -11,7 +11,7 @@ from os.path import join, isfile
 from time import ctime
 from datetime import timedelta, datetime
 
-from docx.shared import Mm, Cm
+from docx.shared import Mm, Cm, Pt
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
@@ -274,14 +274,14 @@ class ReportBuilder:
                     with open(csv_attachment_path, "r", newline="") as csv_attachment:
                         csv_reader = csv.reader(csv_attachment)
                         csv_content = list(csv_reader)
-                        print(csv_content)
                         csv_rows = max(len(csv_content), 1)
                         csv_cols = max(len(csv_content[0]), 1)
                         table = self.document.add_table(rows=csv_rows, cols=csv_cols, style="Normal table")
                         for row in range(csv_rows):
                             cells = table.rows[row].cells
                             for cell in range(csv_cols):
-                                cells[cell].add_paragraph(csv_content[row][cell])
+                                cell_obj = cells[cell]
+                                cell_obj.text = f"{csv_content[row][cell]}"
                 if "image" in attachment["type"]:
                     self.document.add_picture(
                         os.path.join(self.session["allure_dir"], attachment["source"]),
